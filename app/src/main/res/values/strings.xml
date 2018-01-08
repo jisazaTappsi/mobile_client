@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AutoMessenger</string>
+    <string name="url_base">"https://peaku.co"</string>
+    <string name="url_send_contacts">"/dashboard/send_new_contacts"</string>
+</resources>
