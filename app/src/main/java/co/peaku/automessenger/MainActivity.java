@@ -11,6 +11,10 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.widget.Toast;
+import android.widget.Button;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.net.Uri;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,6 +32,23 @@ public class MainActivity extends AppCompatActivity {
     private String url_base;
     private String url_send_contacts;
     private Activity context = this;
+
+    Button button;
+
+    public void addListenerOnButton() {
+
+        button = (Button) findViewById(R.id.add_contacts_button);
+
+        button.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                doTheMagic();
+            }
+
+        });
+
+    }
 
     public HTTPReceiver receiver;
     private HTTPReceiver.Receiver getContactsReceiver = new HTTPReceiver.Receiver() {
@@ -54,6 +75,20 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+    /**
+     * Either asks for permission or requestNewContacts directly.
+     */
+    private void doTheMagic(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_CONTACTS}, PERMISSIONS_REQUEST_WRITE_CONTACTS);
+            //then wait for callback in onRequestPermissionsResult(int, String[], int[]) overridden method
+        } else {
+            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            requestNewContacts();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,13 +97,8 @@ public class MainActivity extends AppCompatActivity {
         url_base = getResources().getString(R.string.url_base);
         url_send_contacts = getResources().getString(R.string.url_send_contacts);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_CONTACTS}, PERMISSIONS_REQUEST_WRITE_CONTACTS);
-            //then wait for callback in onRequestPermissionsResult(int, String[], int[]) overridden method
-        } else {
-            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
-            requestNewContacts();
-        }
+        doTheMagic();
+        addListenerOnButton();
     }
 
 
